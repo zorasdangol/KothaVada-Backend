@@ -1,17 +1,16 @@
 const express = require('express');
 const { default: mongoose } = require('mongoose');
 require('dotenv/config');
-const router = require('./routes/routes.js');
+const router = require('./routes/routes');
 
 const app = express();
 
 //Middleware
-//app.use(bodyParser.json());
 app.use(express.json());
 
 //Route Middlewares
-app.use(router);
 
+app.use('/api', router);
 
 //ROUTES
 app.get('/', (req, res) => {
