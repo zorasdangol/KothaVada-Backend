@@ -28,6 +28,6 @@ mongoose.connect(process.env.DB_CONNECTION, (err) => {
 
 
 //How to start listening to the server
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log('Server up and running ');
 });
