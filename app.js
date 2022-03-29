@@ -1,28 +1,34 @@
-import express from 'express';
-
-import sequelize from './utils/database.js';
-
-import router from './routes/routes.js';
+const express = require('express');
+const { default: mongoose } = require('mongoose');
+require('dotenv/config');
+const router = require('./routes/routes.js');
 
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
-
+//Middleware
+//app.use(bodyParser.json());
 app.use(express.json());
 
-app.use((_, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-});
-
+//Route Middlewares
 app.use(router);
 
-sequelize.sync(); 
 
-const port = process.env.PORT || 5000;
+//ROUTES
+app.get('/', (req, res) => {
+    res.send('We are on home');
+})
 
-app.listen(port,()=> {
-    console.log(`Server started on port :`, port);
+//Connect to DB
+mongoose.connect(process.env.DB_CONNECTION, (err) => {
+    if(err){
+        console.log(err);
+    }else{
+        console.log('connected to db')
+    }
+})
+
+
+//How to start listening to the server
+app.listen(3000, () => {
+    console.log('Server up and running ');
 });
