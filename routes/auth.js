@@ -14,9 +14,13 @@ router.post('/register', async (req, res) => {
             return res.status(400).send(error.details[0].message);
         }else{
             //Checking if user exists
-            const emailExist = await checkUserExists(req.body.email);
-            if(emailExist){
-                return res.status(400).send('Email already exists');
+            //const emailExist = await checkUserExists(req.body.email);
+            // if(emailExist){
+            //     return res.status(400).send('Email already exists');
+            // }
+            const mobileExist = await checkUserExists(req.body.mobile);
+            if(mobileExist){
+                return res.status(400).send('Mobile already exists');
             }
 
             //Hash passwords
@@ -25,9 +29,8 @@ router.post('/register', async (req, res) => {
 
             //Create a new user
             const user = new User({
-                name: req.body.name,
-                email: req.body.email,
                 mobile: req.body.mobile,
+                name: req.body.name,
                 userType: req.body.userType,
                 password: hasPassword
             });
@@ -35,7 +38,7 @@ router.post('/register', async (req, res) => {
             await user.save();
             return res.send({
                 name: req.body.name,
-                email: req.body.email
+                mobile: req.body.mobile
             });
         }
 
@@ -55,9 +58,9 @@ router.post('/login', async (req, res) => {
             return res.status(400).send(error.details[0].message);
         }else{
             //Checking if user exists
-            const user = await checkUserExists(req.body.email);
+            const user = await checkUserExists(req.body.mobile);
             if(!user){
-                return res.status(400).send(`Email doesn't exists`);
+                return res.status(400).send(`User doesn't exists`);
             }else{
 
                 //Check password is correct
