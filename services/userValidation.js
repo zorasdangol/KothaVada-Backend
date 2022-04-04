@@ -11,11 +11,8 @@ const registerValidation = (data) => {
                    .required(),
         name: Joi.string()
                 .min(6)
+                .messages({'string.pattern.base': `Full Name must have 6 letters.`})
                 .required(),
-        //email: Joi.string()
-                //.min(6)
-                //.required()
-                //.email(),
         userType: Joi.string()
                 .min(5)
                 .required(),
