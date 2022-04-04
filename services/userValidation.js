@@ -1,13 +1,14 @@
 const Joi = require('@hapi/joi');
+const User = require('../models/User');
 
 //Register validation
 const registerValidation = (data) => {
 
     const schema = Joi.object({
         mobile: Joi.string()
-                .min(10)
-                .max(10)
-                .required(),
+                   .regex(/^[0-9]{10}$/)
+                   .messages({'string.pattern.base': `Phone number must have 10 digits.`})
+                   .required(),
         name: Joi.string()
                 .min(6)
                 .required(),
@@ -45,7 +46,7 @@ const loginValidation = (data) => {
 //check if user exists
 const checkUserExists = async (mobile) => {
     var userExists = false;
-    
+
     // check email exists
     userExists = await User.findOne({mobile: mobile});
 

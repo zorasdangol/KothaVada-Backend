@@ -5,22 +5,29 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
+const createToken = (res, user) => {
+    //create token 
+    const token = jwt.sign({_id: user._id}, process.env.SECRET_TOKEN );
+    res.header('auth-token', token);
+    console.log('test:' , user);
+    return res.send({
+        _id: user._id, 
+        name: user.name,
+        mobile: user.mobile
+    })
+}
+
 //post route register
 router.post('/register', async (req, res) => {
     try{
         const {error} = registerValidation(req.body);
         if(error){
-            console.log(error);
-            return res.status(400).send(error.details[0].message);
+            console.log('registervalidation' , error);
+            return res.status(400).send({message: error.details[0].message});
         }else{
-            //Checking if user exists
-            //const emailExist = await checkUserExists(req.body.email);
-            // if(emailExist){
-            //     return res.status(400).send('Email already exists');
-            // }
             const mobileExist = await checkUserExists(req.body.mobile);
             if(mobileExist){
-                return res.status(400).send('Mobile already exists');
+                return res.status(400).send({message:'Mobile already exists'});
             }
 
             //Hash passwords
@@ -35,16 +42,15 @@ router.post('/register', async (req, res) => {
                 password: hasPassword
             });
     
-            await user.save();
-            return res.send({
-                name: req.body.name,
-                mobile: req.body.mobile
-            });
+            let savedUser = await user.save();
+            
+            //create token 
+            return createToken(res, savedUser);
         }
 
     }catch(err){
         console.log(err);
-        return res.status(400).send(err);
+        return res.status(400).send({message:err});
     }
 })
 
@@ -55,29 +61,28 @@ router.post('/login', async (req, res) => {
         const {error} = loginValidation(req.body);
         if(error){
             console.log(error);
-            return res.status(400).send(error.details[0].message);
+            return res.status(400).send({message: error.details[0].message});
         }else{
             //Checking if user exists
             const user = await checkUserExists(req.body.mobile);
             if(!user){
-                return res.status(400).send(`User doesn't exists`);
+                return res.status(400).send({message: `User doesn't exists`});
             }else{
 
                 //Check password is correct
                 const validPass = await bcrypt.compare(req.body.password, user.password);
                 if(!validPass){
-                    return res.status(400).send('Invalid password');
+                    return res.status(400).send({message:'Invalid password'});
                 }
 
                 //create token 
-                const token = jwt.sign({_id: user._id}, process.env.SECRET_TOKEN );
-                res.header('auth-token', token).send(token);
+                return createToken(res, user);
             }
         }
 
     }catch(err){
         console.log(err);
-        return res.status(400).send(err);
+        return res.status(400).send({message: err});
     }
 })
 
