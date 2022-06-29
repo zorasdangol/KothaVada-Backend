@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { registerValidation, loginValidation, checkUserExists } = require('../services/userValidation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const tokenVerifier = require('./verifyToken');
 
 
 const createToken = (res, user) => {
@@ -10,10 +11,11 @@ const createToken = (res, user) => {
     const token = jwt.sign({_id: user._id}, process.env.SECRET_TOKEN );
     res.header('auth-token', token);
     console.log('test:' , user);
-    return res.send({
+    return res.status(200).send({
         _id: user._id, 
         name: user.name,
-        mobile: user.mobile
+        mobile: user.mobile,
+        userType: user.userType
     })
 }
 
@@ -85,6 +87,12 @@ router.post('/login', async (req, res) => {
         return res.status(400).send({message: err});
     }
 })
+
+
+//get method to verify token
+router.get('/verifyToken', tokenVerifier,  (req, res) => {
+    res.status(200).send('Token Verified Successfully');
+    });
 
 
 module.exports = router;
