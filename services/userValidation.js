@@ -30,8 +30,7 @@ const loginValidation = (data) => {
     const schema = Joi.object({
         mobile: Joi.string()
                 .min(10)
-                .required()
-                .email(),
+                .required(),
         password: Joi.string()
                 .min(6)
                 .required()
