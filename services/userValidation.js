@@ -28,8 +28,8 @@ const registerValidation = (data) => {
 const loginValidation = (data) => {
 
     const schema = Joi.object({
-        email: Joi.string()
-                .min(6)
+        mobile: Joi.string()
+                .min(10)
                 .required()
                 .email(),
         password: Joi.string()
