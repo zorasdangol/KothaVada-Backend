@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 
 const RentSchema = mongoose.Schema({
-    tenantPhone: {
-        type: Number,
-        max: 10,
-        min: 10
-    },
-    tenantName: {
+    roomId: {
         type: String,
         required: true
     },
-    roomId: {
+    tenantId: {
+        type: String,
+        required: true
+    },
+    landlordId: {
         type: String,
         required: true
     },
@@ -18,27 +17,45 @@ const RentSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    electricityPerUnit: {
+        type: Number,
+        default: 15
+    },
     electricityUnit: {
         type: Number,
         required: true
     },
+    electricityCharge: {
+        type: Number,
+        required: true
+    },
     garbageCharge: {
-        type: Number
+        type: Number,
+        default: 0
     },
     waterCharge: {
-        type: Number
+        type: Number,
+        default: 0
+    },
+    internetCharge: {
+        type: Number,
+        default: 0
     },
     previousDue: {
-        type: Number
+        type: Number,
+        default: 0
     },
     totalRent: {
-        type: Number
+        type: Number,
+        default: 0
     },
     paidRent: {
-        type: Number
+        type: Number,
+        default: 0
     },
     pendingRent: {
-        type: Number
+        type: Number,
+        default: 0
     },
     dateStart: {
         type: Date,
@@ -53,10 +70,6 @@ const RentSchema = mongoose.Schema({
         required: true,
         enum: ['Unpaid','Partial','Paid'],
         default: 'Unpaid'
-    },
-    landlordId: {
-        type: String,
-        required: true
     }
 })
 

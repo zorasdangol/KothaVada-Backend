@@ -8,6 +8,7 @@ router.use((req, res, next) => {
 });
 
 router.use('/users', require('./auth'));
-router.use('/posts', require('./posts'));
+router.use('/rooms', require('./rooms'));
+router.use('/rents', require('./rents'));
 
 module.exports = router;

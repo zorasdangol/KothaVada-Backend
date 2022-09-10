@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const RentSchema = mongoose.Schema({
+const RoomSchema = mongoose.Schema({
     roomName: {
         type: String,
         required: true
@@ -14,9 +14,8 @@ const RentSchema = mongoose.Schema({
         max: 10,
         min: 10
     },
-    tenantName: {
+    tenantId: {
         type: String,
-        required: true
     },
     type: {
         type: String,
@@ -24,14 +23,20 @@ const RentSchema = mongoose.Schema({
         enum: ['Flat','Room'],
         default: 'Flat'
     },
+    occupancy: {
+        type: String,
+        required: true,
+        enum: ['Vacant', 'Full'],
+        default: 'Vacant'
+    },
+    floor: {
+        type: String,
+    },
     price: {
         type: Number,
         required: true
     },
     garbageCharge: {
-        type: Number
-    },
-    waterCharge: {
         type: Number
     },
     electricityPerUnit: {
@@ -41,4 +46,4 @@ const RentSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Rooms', RentSchema);
+module.exports = mongoose.model('Rooms', RoomSchema);
