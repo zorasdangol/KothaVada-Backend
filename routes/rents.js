@@ -13,7 +13,7 @@ router.get('/', tokenVerifier,  async (req, res) => {
         const items = await Rent.find({landlordId: req.user._id});
         res.json(items);
     }catch(err){
-        req.json({message: err});
+        req.status(400).json({message: err});
     }
 });
 
@@ -64,13 +64,13 @@ router.post('/', tokenVerifier, async (req, res) => {
                 await session.abortTransaction();
                 session.endSession();
                 console.log('test', err);
-                res.json({message: err});
+                res.status(400).json({message: err});
             });       
     }catch(err){
         console.log('test:' + err);
         await session.abortTransaction();
         session.endSession();
-        res.json({message: err});
+        res.status(400).json({message: err});
     }    
 });
 
@@ -80,7 +80,7 @@ router.delete('/:rentId', async (req, res) => {
         const removedItem = await Rent.remove({_id: req.params.rentId});
         res.json(removedItem);
     }catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 
@@ -104,7 +104,7 @@ router.patch('/:rentId', async (req, res) => {
         res.json(rent);
     }catch(err){
         console.log(err);
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 
@@ -129,7 +129,7 @@ router.patch('pay/:rentId', async (req, res) => {
         res.json(rent);
     }catch(err){
         console.log(err);
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 

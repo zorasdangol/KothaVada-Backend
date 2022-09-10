@@ -10,7 +10,7 @@ router.get('/', tokenVerifier,  async (req, res) => {
         const rooms = await Room.find({landlordId: req.user._id});
         res.json(rooms);
     }catch(err){
-        req.json({message: err});
+        req.status(400).json({message: err});
     }
 });
 
@@ -28,7 +28,7 @@ router.post('/', tokenVerifier, async (req, res) => {
         })
         .catch( err => {
             console.log('test', err);
-            res.json({message: err});
+            res.status(400).json({message: err});
         });
 });
 
@@ -39,7 +39,7 @@ router.get('/:roomId',tokenVerifier,  async (req, res) => {
         const room  = await Room.findById(req.params.roomId);
         res.json(room);    
     }catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 
@@ -48,7 +48,7 @@ router.delete('/:roomId', async (req, res) => {
         const removedItem = await Room.remove({_id: req.params.roomId});
         res.json(removedItem);
     }catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 
@@ -61,7 +61,7 @@ router.patch('/:roomId', async (req, res) => {
             );
         res.json(updatedRoom);
     }catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 });
 
