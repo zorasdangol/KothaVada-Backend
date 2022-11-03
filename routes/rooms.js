@@ -52,7 +52,7 @@ router.delete("/:roomId", async (req, res) => {
 });
 
 //update a post
-router.patch("/:roomId", async (req, res) => {
+router.patch("/:roomId", tokenVerifier, async (req, res) => {
   try {
     console.log("test here" + req.params.roomId);
     const updatedRoom = createDataFromReqBody(req.body);
@@ -70,7 +70,7 @@ const createDataFromReqBody = (body) => {
   const room = new Room({
     roomName: body.roomName,
     landlordId: body.landlordId,
-    tenantPhone: body.tenantPhone,
+    tenantId: body.tenantId,
     type: body.type,
     occupancy: body.occupancy,
     floor: body.floor,
