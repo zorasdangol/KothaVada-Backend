@@ -9,7 +9,26 @@ router.get("/", tokenVerifier, async (req, res) => {
     const rooms = await Room.find({ landlordId: req.user._id });
     res.json(rooms);
   } catch (err) {
-    req.status(400).json({ message: err });
+    res.status(400).json({ message: err });
+  }
+});
+
+//get back teannt room details
+router.get("/tenantRooms", tokenVerifier, async (req, res) => {
+  try {
+    const tenantDetails = await Tenant.find({
+      userId: req.user._id,
+      status: "Active",
+    });
+    if (tenantDetails && tenantDetails.length > 0) {
+      let rooms = [];
+      tenantDetails.map(async (item) => {
+        rooms.add(await Room.find({ tenantId: item._id }));
+      });
+      res.json(rooms);
+    }
+  } catch (err) {
+    res.status(400).json({ message: err });
   }
 });
 
@@ -52,7 +71,7 @@ router.delete("/:roomId", async (req, res) => {
 });
 
 //update a post
-router.patch("/:roomId", async (req, res) => {
+router.patch("/:roomId", tokenVerifier, async (req, res) => {
   try {
     console.log("test here" + req.params.roomId);
     const updatedRoom = createDataFromReqBody(req.body);
@@ -70,7 +89,7 @@ const createDataFromReqBody = (body) => {
   const room = new Room({
     roomName: body.roomName,
     landlordId: body.landlordId,
-    tenantPhone: body.tenantPhone,
+    tenantId: body.tenantId,
     type: body.type,
     occupancy: body.occupancy,
     floor: body.floor,
