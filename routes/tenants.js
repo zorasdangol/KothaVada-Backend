@@ -19,7 +19,6 @@ router.post("/", tokenVerifier, async (req, res) => {
 
     //update user id in tenant
     if (tenant.tenantPhone) {
-      await session.commitTransaction();
       let user = await User.findOne({ mobile: tenant.tenantPhone });
       if (user) {
         tenant.userId = user._id;
@@ -33,16 +32,15 @@ router.post("/", tokenVerifier, async (req, res) => {
         status: STATUS_TENANT.INACTIVE,
       },
     };
-    await session.commitTransaction();
     const result = await Tenant.updateMany(filter, updateTenant);
 
     await tenant
       .save()
       .then(async (data) => {
-        await session.commitTransaction();
         //Update room for tenant
         updateRoom(session, data);
 
+        await session.commitTransaction();
         res.json(data);
       })
       .catch(async (err) => {
@@ -58,10 +56,8 @@ router.post("/", tokenVerifier, async (req, res) => {
 
 //post method to return tenant details from roomId
 router.get("/:roomId", tokenVerifier, async (req, res) => {
-  console.log(req.params.roomId);
   try {
     const room = await Tenant.find({ roomId: req.params.roomId });
-    console.log();
     res.json(room);
   } catch (err) {
     res.status(400).json({ message: err });
@@ -70,7 +66,6 @@ router.get("/:roomId", tokenVerifier, async (req, res) => {
 
 //post method to return tenant details from tenantId
 router.get("/:tenantId", tokenVerifier, async (req, res) => {
-  console.log(req.params.tenantId);
   try {
     const tenant = await Tenant.findById(req.params.tenantId);
     res.json(tenant);
@@ -81,11 +76,13 @@ router.get("/:tenantId", tokenVerifier, async (req, res) => {
 
 //update a tenant
 router.patch("/:tenantId", tokenVerifier, async (req, res) => {
+  const session = await conn.startSession();
+  session.startTransaction();
   try {
-    const session = await conn.startSession();
     let updatedData = createDataFromReqBody(req.body);
 
     //update user id in tenant
+
     if (updatedData.tenantPhone) {
       let user = User.find({ mobile: updatedData.tenantPhone });
       if (user) {
@@ -94,11 +91,12 @@ router.patch("/:tenantId", tokenVerifier, async (req, res) => {
     }
 
     //update tenant data
-    session.commitTransaction();
     await Tenant.updateOne({ _id: req.params.tenantId }, { $set: updatedData });
 
     //update room data
     await updateRoom(session, updatedData);
+
+    session.commitTransaction();
 
     res.json(updatedData);
   } catch (err) {
@@ -132,11 +130,11 @@ const updateRoom = async (session, tenant) => {
   try {
     //Update room for tenant
     let room = await Room.findById(tenant.roomId);
-    room.tenantId = tenant._id;
-    room.tenantName = tenant.tenantName;
-
-    await session.commitTransaction();
-    await Room.updateOne({ _id: room._id }, { $set: room });
+    if (room) {
+      room.tenantId = tenant._id;
+      room.tenantName = tenant.tenantName;
+      await Room.updateOne({ _id: room._id }, { $set: room });
+    }
   } catch (error) {
     throw error;
   }
