@@ -12,6 +12,9 @@ const RoomSchema = mongoose.Schema({
   tenantId: {
     type: String,
   },
+  tenantName: {
+    type: String,
+  },
   type: {
     type: String,
     required: true,
