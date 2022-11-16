@@ -11,10 +11,9 @@ const { STATUS_TENANT } = require("../constants/appContants");
 
 //ADD A Tenent
 router.post("/", tokenVerifier, async (req, res) => {
+  const session = await conn.startSession();
+  session.startTransaction();
   try {
-    console.log(req.body);
-    const session = await conn.startSession();
-    session.startTransaction();
     const tenant = createDataFromReqBody(req.body);
 
     //update user id in tenant
@@ -45,20 +44,22 @@ router.post("/", tokenVerifier, async (req, res) => {
       })
       .catch(async (err) => {
         await session.abortTransaction();
-        session.endSession();
         console.log("test", err);
         res.json({ message: err });
       });
   } catch (err) {
+    await session.abortTransaction();
     res.json({ message: err });
+  } finally {
+    session.endSession();
   }
 });
 
 //post method to return tenant details from roomId
-router.get("/:roomId", tokenVerifier, async (req, res) => {
+router.get("/queryFromRoomId/:roomId", tokenVerifier, async (req, res) => {
   try {
-    const room = await Tenant.find({ roomId: req.params.roomId });
-    res.json(room);
+    const tenants = await Tenant.find({ roomId: req.params.roomId });
+    res.json(tenants);
   } catch (err) {
     res.status(400).json({ message: err });
   }
@@ -77,7 +78,7 @@ router.get("/:tenantId", tokenVerifier, async (req, res) => {
 //update a tenant
 router.patch("/:tenantId", tokenVerifier, async (req, res) => {
   const session = await conn.startSession();
-  session.startTransaction();
+  await session.startTransaction();
   try {
     let updatedData = createDataFromReqBody(req.body);
 
@@ -96,12 +97,14 @@ router.patch("/:tenantId", tokenVerifier, async (req, res) => {
     //update room data
     await updateRoom(session, updatedData);
 
-    session.commitTransaction();
+    await session.commitTransaction();
 
     res.json(updatedData);
   } catch (err) {
-    session.abortTransaction();
+    await session.abortTransaction();
     res.json({ message: err });
+  } finally {
+    session.endSession();
   }
 });
 
