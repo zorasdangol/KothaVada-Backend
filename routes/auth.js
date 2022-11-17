@@ -6,11 +6,13 @@ const {
   checkUserExists,
   generateOTP,
   SMSValidation,
+  OTPValidation,
 } = require("../services/userValidation");
 const { sendOTP } = require("../services/OTPService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenVerifier = require("./verifyToken");
+const OTPVerifier = require("./OTPVerifier");
 
 const createToken = (res, user) => {
   //create token
@@ -110,7 +112,7 @@ router.get("/sendOTP", (req, res) => {
       let response = sendOTP(req.body);
       if (response === 200) {
         return res.status(200).send({
-          status: response,
+          status: response.response_code,
         });
       } else {
         return res.status(400).send({ message: "Error sending OTP." });
@@ -119,6 +121,22 @@ router.get("/sendOTP", (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(400).send({ message: err });
+  }
+});
+
+//get method to verify OTP
+router.get("/verifyOTP", (req, res) => {
+  console.log("otpvalidation");
+  const { error } = OTPValidation(req.body);
+  console.log(error);
+  if (error) {
+    res.status(400).send({ message: error.details[0].message });
+  } else {
+    if (OTPVerifier(req)) {
+      res.status(200).send({ message: "OTP Verified Successfully" });
+    } else {
+      res.status(400).send({ message: "Invalid OTP" });
+    }
   }
 });
 

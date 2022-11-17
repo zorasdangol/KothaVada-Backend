@@ -1,5 +1,6 @@
 const Joi = require("@hapi/joi");
 const User = require("../models/User");
+const KVConstants = require("../constants/appContants");
 
 //Register validation
 const registerValidation = (data) => {
@@ -40,9 +41,17 @@ const checkUserExists = async (mobile) => {
 };
 //Send OTP validation
 const SMSValidation = (data) => {
+  console.log(data);
   const schema = Joi.object({
     to: Joi.string().min(10).required(),
     text: Joi.string().min(6).required(),
+  });
+  return schema.validate(data);
+};
+const OTPValidation = (data) => {
+  const schema = Joi.object({
+    mobile: Joi.string().min(10).required(),
+    OTPCode: Joi.string().min(6).required(),
   });
   return schema.validate(data);
 };
@@ -63,3 +72,4 @@ module.exports.loginValidation = loginValidation;
 module.exports.checkUserExists = checkUserExists;
 module.exports.generateOTP = generateOTP;
 module.exports.SMSValidation = SMSValidation;
+module.exports.OTPValidation = OTPValidation;
