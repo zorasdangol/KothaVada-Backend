@@ -139,6 +139,8 @@ router.patch("pay/:rentId", async (req, res) => {
 const createDataFromReqBody = (body) => {
   const item = new Rent({
     roomId: body.roomId,
+    roomName: body.roomName,
+    tenantName: body.tenantName,
     tenantId: body.tenantId,
     roomRent: body.roomRent,
     electricityUnit: setNullToZero(body.electricityUnit),

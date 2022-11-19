@@ -7,7 +7,6 @@ const RentSchema = mongoose.Schema({
   },
   roomName: {
     type: String,
-    required: true,
   },
   tenantId: {
     type: String,
@@ -15,7 +14,6 @@ const RentSchema = mongoose.Schema({
   },
   tenantName: {
     type: String,
-    required: true,
   },
   landlordId: {
     type: String,
