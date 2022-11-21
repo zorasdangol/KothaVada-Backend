@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Room = require("../models/Room");
+const Tenant = require("../models/Tenant");
 const tokenVerifier = require("./verifyToken");
+
+const conn = require("../services/connection");
 
 //get back all the rooms
 router.get("/", tokenVerifier, async (req, res) => {
@@ -62,11 +65,18 @@ router.get("/:roomId", tokenVerifier, async (req, res) => {
 });
 
 router.delete("/:roomId", async (req, res) => {
+  const session = await conn.startSession();
+  session.startTransaction();
   try {
     const removedItem = await Room.remove({ _id: req.params.roomId });
+    const tenants = await Tenant.remove({ roomId: req.params.roomId });
+    await session.commitTransaction();
     res.json(removedItem);
   } catch (err) {
+    await session.abortTransaction();
     res.status(400).json({ message: err });
+  } finally {
+    session.endSession();
   }
 });
 
