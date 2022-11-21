@@ -40,7 +40,7 @@ const checkUserExists = async (mobile) => {
   return userExists;
 };
 //Send OTP validation
-const SMSValidation = (data) => {
+const smsValidation = (data) => {
   console.log(data);
   const schema = Joi.object({
     to: Joi.string().min(10).required(),
@@ -48,10 +48,10 @@ const SMSValidation = (data) => {
   });
   return schema.validate(data);
 };
-const OTPValidation = (data) => {
+const otpValidation = (data) => {
   const schema = Joi.object({
     mobile: Joi.string().min(10).required(),
-    OTPCode: Joi.string().min(6).required(),
+    otp: Joi.string().min(6).required(),
   });
   return schema.validate(data);
 };
@@ -71,5 +71,5 @@ module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.checkUserExists = checkUserExists;
 module.exports.generateOTP = generateOTP;
-module.exports.SMSValidation = SMSValidation;
-module.exports.OTPValidation = OTPValidation;
+module.exports.smsValidation = smsValidation;
+module.exports.otpValidation = otpValidation;

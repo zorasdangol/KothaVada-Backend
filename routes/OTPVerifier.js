@@ -1,6 +1,6 @@
 const User = require("../models/User");
 
-async function OTPVerifier(req, res) {
+async function otpVerifier(req, res) {
   try {
     // uncomment later during production
     // userExists = await User.findOne({ mobile: req.body.mobile });
@@ -15,4 +15,4 @@ async function OTPVerifier(req, res) {
   }
 }
 
-module.exports = OTPVerifier;
+module.exports = otpVerifier;

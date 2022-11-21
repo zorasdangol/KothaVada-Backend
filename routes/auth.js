@@ -5,14 +5,14 @@ const {
   loginValidation,
   checkUserExists,
   generateOTP,
-  SMSValidation,
-  OTPValidation,
+  smsValidation,
+  otpValidation,
 } = require("../services/userValidation");
-const { sendOTP } = require("../services/OTPService");
+const { sendOTP } = require("../services/otpService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenVerifier = require("./verifyToken");
-const OTPVerifier = require("./OTPVerifier");
+const OTPVerifier = require("./otpVerifier");
 
 const createToken = (res, user) => {
   //create token
@@ -54,8 +54,6 @@ router.post("/register", async (req, res) => {
       });
 
       let savedUser = await user.save();
-      // uncomment later during production
-      // let response = sendOTP(req.body);
       //create token
       return createToken(res, savedUser);
     }
@@ -105,7 +103,7 @@ router.get("/verifyToken", tokenVerifier, (req, res) => {
 // router.get("/sendOTP", tokenVerifier, (req, res) => {
 router.get("/sendOTP", (req, res) => {
   try {
-    const { error } = SMSValidation(req.body);
+    const { error } = smsValidation(req.body);
     if (error) {
       console.log(error);
       return res.status(400).send({ message: error.details[0].message });
@@ -128,7 +126,7 @@ router.get("/sendOTP", (req, res) => {
 //get method to verify OTP
 router.get("/verifyOTP", (req, res) => {
   console.log("otpvalidation");
-  const { error } = OTPValidation(req.body);
+  const { error } = otpValidation(req.body);
   console.log(error);
   if (error) {
     res.status(400).send({ message: error.details[0].message });
