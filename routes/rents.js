@@ -8,7 +8,7 @@ const {
   getPreviousDueRent,
 } = require("../services/rentCalculation");
 const { STATUS_PAYMENT } = require("../constants/appContants");
-const mongoose = require("mongoose");
+
 const conn = require("../services/connection");
 
 //get back all the rents
