@@ -124,7 +124,7 @@ router.get("/sendOTP", (req, res) => {
 });
 
 //get method to verify OTP
-router.get("/verifyOTP", (req, res) => {
+router.get("/verifyOTP", async (req, res) => {
   console.log("otpvalidation");
   const { error } = otpValidation(req.body);
   console.log(error);
@@ -132,6 +132,13 @@ router.get("/verifyOTP", (req, res) => {
     res.status(400).send({ message: error.details[0].message });
   } else {
     if (OTPVerifier(req)) {
+      const user = await checkUserExists(req.body.mobile);
+      if (user) {
+        const updatedItem = await User.updateOne(
+          { _id: user._id },
+          { $set: { otpVerified: true } }
+        );
+      }
       res.status(200).send({ message: "OTP Verified Successfully" });
     } else {
       res.status(400).send({ message: "Invalid OTP" });
