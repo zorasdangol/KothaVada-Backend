@@ -54,7 +54,8 @@ router.post("/register", async (req, res) => {
       });
 
       let savedUser = await user.save();
-
+      // uncomment later during production
+      // let response = sendOTP(req.body);
       //create token
       return createToken(res, savedUser);
     }

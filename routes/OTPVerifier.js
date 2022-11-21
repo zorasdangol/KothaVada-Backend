@@ -1,11 +1,15 @@
-function OTPVerifier(req, res) {
+const User = require("../models/User");
+
+async function OTPVerifier(req, res) {
   try {
-    // proper condition left
-    if (req.body.OTP == req.body.OTP) {
-      return true;
-    } else {
-      return false;
-    }
+    // uncomment later during production
+    // userExists = await User.findOne({ mobile: req.body.mobile });
+    // if (userExists && req.body.OTP === userExists.OTP) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+    return true;
   } catch (err) {
     return false;
   }
