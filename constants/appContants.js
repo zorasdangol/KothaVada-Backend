@@ -9,6 +9,11 @@ module.exports.STATUS_TENANT = {
   INACTIVE: "InActive",
 };
 
+module.exports.USER_TYPE = {
+  LANDLORD: "LANDLORD",
+  TENANT: "TENANT",
+};
+
 module.exports.SMS = {
   API_URL_SMS: "http://api.sparrowsms.com/v2/sms/",
   FROM: "Demo",

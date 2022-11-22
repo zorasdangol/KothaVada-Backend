@@ -16,7 +16,6 @@ const createToken = (res, user) => {
   //create token
   const token = jwt.sign({ _id: user._id }, process.env.SECRET_TOKEN);
   res.header("auth-token", token);
-  console.log("test:", user);
   return res.status(200).send({
     _id: user._id,
     name: user.name,
