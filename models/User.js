@@ -1,4 +1,3 @@
-const { boolean } = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -38,11 +37,12 @@ const userSchema = new mongoose.Schema({
     min: 6,
   },
   otpVerified: {
-    type: boolean,
+    type: Boolean,
     default: false,
   },
   otpCount: {
     type: Number,
+    default: 0,
   },
 });
 

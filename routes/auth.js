@@ -4,15 +4,13 @@ const {
   registerValidation,
   loginValidation,
   checkUserExists,
-  generateOTP,
-  smsValidation,
-  otpValidation,
 } = require("../services/userValidation");
-const { sendOTP } = require("../services/otpService");
+const { sendOTP, generateOTP } = require("../services/otpService");
+const { smsValidation, otpValidation } = require("../services/otpValidation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenVerifier = require("./verifyToken");
-const OTPVerifier = require("./otpVerifier");
+const otpVerifier = require("./otpVerifier");
 
 const createToken = (res, user) => {
   //create token
@@ -24,6 +22,9 @@ const createToken = (res, user) => {
     name: user.name,
     mobile: user.mobile,
     userType: user.userType,
+    otp: user.otp,
+    otpVerified: user.otpVerified,
+    otpCount: user.otpCount,
   });
 };
 
@@ -51,6 +52,7 @@ router.post("/register", async (req, res) => {
         userType: req.body.userType,
         password: hasPassword,
         otp: generateOTP(),
+        otpCount: 1,
       });
 
       let savedUser = await user.save();
@@ -101,14 +103,14 @@ router.get("/verifyToken", tokenVerifier, (req, res) => {
 });
 
 // router.get("/sendOTP", tokenVerifier, (req, res) => {
-router.get("/sendOTP", (req, res) => {
+router.post("/sendOTP", async (req, res) => {
   try {
     const { error } = smsValidation(req.body);
     if (error) {
       console.log(error);
       return res.status(400).send({ message: error.details[0].message });
     } else {
-      let response = sendOTP(req.body);
+      let response = await sendOTP(req.body);
       if (response === 200) {
         return res.status(200).send({
           status: response.response_code,
@@ -119,30 +121,29 @@ router.get("/sendOTP", (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return res.status(400).send({ message: err });
+    return res.status(400).send({ message: err.message ? err.message : err });
   }
 });
 
 //get method to verify OTP
-router.get("/verifyOTP", async (req, res) => {
-  console.log("otpvalidation");
-  const { error } = otpValidation(req.body);
-  console.log(error);
-  if (error) {
-    res.status(400).send({ message: error.details[0].message });
-  } else {
-    if (OTPVerifier(req)) {
-      const user = await checkUserExists(req.body.mobile);
-      if (user) {
-        const updatedItem = await User.updateOne(
-          { _id: user._id },
-          { $set: { otpVerified: true } }
-        );
-      }
-      res.status(200).send({ message: "OTP Verified Successfully" });
+router.post("/verifyOTP", async (req, res) => {
+  try {
+    //validate otp request
+    const { error } = otpValidation(req.body);
+    if (error) {
+      console.log(error);
+      return res.status(400).send({ message: error.details[0].message });
     } else {
-      res.status(400).send({ message: "Invalid OTP" });
+      //verify otp
+      let isOtpVerified = await otpVerifier(req);
+      if (isOtpVerified) {
+        res.status(200).send({ message: "OTP Verified Successfully" });
+      } else {
+        res.status(400).send({ message: "Invalid OTP" });
+      }
     }
+  } catch (error) {
+    res.status(400).send({ message: error.message ? error.message : error });
   }
 });
 
