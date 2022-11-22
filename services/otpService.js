@@ -1,13 +1,12 @@
 require("fetch-everywhere");
 const KVConstants = require("../constants/appContants");
-const { generateOTP } = require("./userValidation");
 
 const sendOTP = async (smsData) => {
   let response;
   smsData.token = KVConstants.SMS.TOKEN;
   smsData.from = KVConstants.SMS.FROM;
-  console.log("smsdata" + JSON.stringify(smsData));
-  console.log("api url" + KVConstants.SMS.API_URL_SMS);
+
+  //send sms to mobile api call
   await fetch(KVConstants.SMS.API_URL_SMS, {
     // mode: 'no-cors',
     method: "POST",
@@ -24,12 +23,30 @@ const sendOTP = async (smsData) => {
         response = res.status;
       } catch (err) {
         console.log(err);
+        throw err;
       }
     })
     .catch((err) => {
       console.log(err);
+      throw err;
     });
 
   return response;
 };
+
+/*
+ * method to generate otp
+ */
+const generateOTP = () => {
+  var otpLength = KVConstants.SMS.OTP_LENGTH;
+  let number = 1;
+  for (let i = 0; i < otpLength; i++) {
+    number = number * 10;
+  }
+  let otpNumber = Math.floor(Math.random() * number);
+  console.log("OTPNumber" + number);
+  return otpNumber;
+};
+
 module.exports.sendOTP = sendOTP;
+module.exports.generateOTP = generateOTP;

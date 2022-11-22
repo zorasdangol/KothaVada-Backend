@@ -118,7 +118,7 @@ router.patch("pay/:rentId", async (req, res) => {
     let rent = createDataFromReqBody(req.body);
 
     //calculate rent
-    const calculatedRent = calculateRent(rent);
+    const calculatedRent = calculatePaidRent(rent);
     rent = calculatedRent;
 
     console.log(rent);

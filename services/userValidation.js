@@ -1,6 +1,5 @@
 const Joi = require("@hapi/joi");
 const User = require("../models/User");
-const KVConstants = require("../constants/appContants");
 
 //Register validation
 const registerValidation = (data) => {
@@ -32,44 +31,14 @@ const loginValidation = (data) => {
 
 //check if user exists
 const checkUserExists = async (mobile) => {
-  var userExists = false;
+  let userExists = false;
 
   // check email exists
   userExists = await User.findOne({ mobile: mobile });
 
   return userExists;
 };
-//Send OTP validation
-const smsValidation = (data) => {
-  console.log(data);
-  const schema = Joi.object({
-    to: Joi.string().min(10).required(),
-    text: Joi.string().min(6).required(),
-  });
-  return schema.validate(data);
-};
-const otpValidation = (data) => {
-  const schema = Joi.object({
-    mobile: Joi.string().min(10).required(),
-    otp: Joi.string().min(6).required(),
-  });
-  return schema.validate(data);
-};
-
-const generateOTP = () => {
-  var otpLength = KVConstants.SMS.OTP_LENGTH;
-  let number = 1;
-  for (let i = 0; i < otpLength; i++) {
-    number = number * 10;
-  }
-  let otpNumber = Math.floor(Math.random() * number);
-  console.log("OTPNumber" + number);
-  return otpNumber;
-};
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.checkUserExists = checkUserExists;
-module.exports.generateOTP = generateOTP;
-module.exports.smsValidation = smsValidation;
-module.exports.otpValidation = otpValidation;
