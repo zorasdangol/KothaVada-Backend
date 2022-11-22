@@ -21,6 +21,21 @@ router.get("/", tokenVerifier, async (req, res) => {
   }
 });
 
+/*
+ * get back pending the rents
+ */
+router.get("/pending", tokenVerifier, async (req, res) => {
+  try {
+    const items = await Rent.find({
+      landlordId: req.user._id,
+      status: STATUS_PAYMENT.UNPAID,
+    });
+    res.json(items);
+  } catch (err) {
+    req.status(400).json({ message: err });
+  }
+});
+
 //ADD A rent
 router.post("/", tokenVerifier, async (req, res) => {
   const session = await conn.startSession();
