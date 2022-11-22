@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const Rent = require("../models/Rent");
+const User = require("../models/User");
 const tokenVerifier = require("./verifyToken");
 const {
   calculateRent,
   calculatePaidRent,
   getPreviousDueRent,
 } = require("../services/rentCalculation");
-const { STATUS_PAYMENT } = require("../constants/appContants");
+const { STATUS_PAYMENT, USER_TYPE } = require("../constants/appContants");
 
 const conn = require("../services/connection");
 
@@ -18,6 +19,26 @@ router.get("/", tokenVerifier, async (req, res) => {
     res.json(items);
   } catch (err) {
     req.status(400).json({ message: err });
+  }
+});
+
+/*
+ * get back pending the rents
+ */
+router.get("/pending", tokenVerifier, async (req, res) => {
+  try {
+    let filter = { status: STATUS_PAYMENT.UNPAID };
+    let user = await User.findOne({ _id: req.user._id });
+    //add landlordId or tenantId filter
+    if (user && user.userType === USER_TYPE.LANDLORD) {
+      filter.landlordId = user._id;
+    } else {
+      filter.tenantId = user._id;
+    }
+    const items = await Rent.find(filter);
+    res.json(items);
+  } catch (err) {
+    res.status(400).json({ message: err.message ? err.message : err });
   }
 });
 
