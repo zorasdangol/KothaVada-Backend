@@ -8,7 +8,7 @@ const {
   getPreviousDueRent,
 } = require("../services/rentCalculation");
 const { STATUS_PAYMENT } = require("../constants/appContants");
-const mongoose = require("mongoose");
+
 const conn = require("../services/connection");
 
 //get back all the rents
@@ -139,6 +139,8 @@ router.patch("pay/:rentId", async (req, res) => {
 const createDataFromReqBody = (body) => {
   const item = new Rent({
     roomId: body.roomId,
+    roomName: body.roomName,
+    tenantName: body.tenantName,
     tenantId: body.tenantId,
     roomRent: body.roomRent,
     electricityUnit: setNullToZero(body.electricityUnit),
