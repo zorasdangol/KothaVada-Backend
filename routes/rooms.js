@@ -27,11 +27,14 @@ router.get("/tenantRooms", tokenVerifier, async (req, res) => {
     });
     if (tenantDetails && tenantDetails.length > 0) {
       //get rooms related to tenant
-      let rooms = [];
-      tenantDetails.map(async (item) => {
-        rooms.add(await Room.find({ tenantId: item._id }));
+      let roomIds = [];
+      tenantDetails.forEach((element) => {
+        roomIds.push(element.roomId);
       });
+      let rooms = await Room.find({ _id: { $in: roomIds } });
       res.json(rooms);
+    } else {
+      res.json([]);
     }
   } catch (err) {
     res.status(400).json({ message: err });
