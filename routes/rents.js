@@ -100,7 +100,7 @@ router.post("/", tokenVerifier, async (req, res) => {
 });
 
 //router to delete specific rent
-router.delete("/:rentId", async (req, res) => {
+router.delete("/:rentId", tokenVerifier, async (req, res) => {
   try {
     const removedItem = await Rent.remove({ _id: req.params.rentId });
     res.json(removedItem);
@@ -110,7 +110,7 @@ router.delete("/:rentId", async (req, res) => {
 });
 
 //update a rent
-router.patch("/:rentId", async (req, res) => {
+router.patch("/:rentId", tokenVerifier, async (req, res) => {
   try {
     let rent = createDataFromReqBody(req.body);
 
@@ -134,7 +134,7 @@ router.patch("/:rentId", async (req, res) => {
 });
 
 //update a rent
-router.patch("pay/:rentId", async (req, res) => {
+router.patch("/pay/:rentId", tokenVerifier, async (req, res) => {
   try {
     let rent = createDataFromReqBody(req.body);
 
