@@ -1,16 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const Rent = require("../models/Rent");
-const User = require("../models/User");
+const Tenant = require("../models/Tenant");
 const tokenVerifier = require("./verifyToken");
 const {
   calculateRent,
   calculatePaidRent,
   getPreviousDueRent,
 } = require("../services/rentCalculation");
-const { STATUS_PAYMENT, USER_TYPE } = require("../constants/appContants");
+const { STATUS_PAYMENT } = require("../constants/appContants");
 
 const conn = require("../services/connection");
+const { isLandlordUser } = require("../services/userValidation");
+const { setNullToZero } = require("../utils/kvBase");
 
 //get back all the rents
 router.get("/", tokenVerifier, async (req, res) => {
@@ -28,14 +30,14 @@ router.get("/", tokenVerifier, async (req, res) => {
 router.get("/pending", tokenVerifier, async (req, res) => {
   try {
     let filter = { status: STATUS_PAYMENT.UNPAID };
-    let user = await User.findOne({ _id: req.user._id });
-    //add landlordId or tenantId filter
-    if (user && user.userType === USER_TYPE.LANDLORD) {
-      filter.landlordId = user._id;
+    let isLandlord = await isLandlordUser(req.user._id);
+    if (isLandlord) {
+      filter.landlordId = req.user._id;
     } else {
-      filter.tenantId = user._id;
+      //filter for tenant rents
+      filter.tenantUserId = req.user._id;
     }
-    const items = await Rent.find(filter);
+    let items = await Rent.find(filter);
     res.json(items);
   } catch (err) {
     res.status(400).json({ message: err.message ? err.message : err });
@@ -51,7 +53,11 @@ router.post("/", tokenVerifier, async (req, res) => {
 
     //update landlordId in rent
     rent.landlordId = req.user._id;
-
+    // update tenantUserId in rent
+    let tenant = await Tenant.findOne({ _id: rent.tenantId });
+    if (tenant) {
+      rent.tenantUserId = tenant.userId;
+    }
     //calculate previous due
     let previousDueRent;
     await getPreviousDueRent(rent).then((data) => {
@@ -163,6 +169,7 @@ const createDataFromReqBody = (body) => {
     roomName: body.roomName,
     tenantName: body.tenantName,
     tenantId: body.tenantId,
+    tenantUserId: body.tenantUserId,
     roomRent: body.roomRent,
     electricityUnit: setNullToZero(body.electricityUnit),
     electricityCharge: setNullToZero(body.electricityCharge),
@@ -181,10 +188,6 @@ const createDataFromReqBody = (body) => {
     item._id = body._id;
   }
   return item;
-};
-
-const setNullToZero = (value) => {
-  return value ? value : "0";
 };
 
 module.exports = router;

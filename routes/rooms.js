@@ -5,6 +5,7 @@ const Tenant = require("../models/Tenant");
 const tokenVerifier = require("./verifyToken");
 
 const conn = require("../services/connection");
+const { STATUS_TENANT } = require("../constants/appContants");
 
 //get back all the rooms
 router.get("/", tokenVerifier, async (req, res) => {
@@ -19,11 +20,13 @@ router.get("/", tokenVerifier, async (req, res) => {
 //get back teannt room details
 router.get("/tenantRooms", tokenVerifier, async (req, res) => {
   try {
+    //get tenant list for tenant
     const tenantDetails = await Tenant.find({
       userId: req.user._id,
-      status: "Active",
+      status: STATUS_TENANT.ACTIVE,
     });
     if (tenantDetails && tenantDetails.length > 0) {
+      //get rooms related to tenant
       let rooms = [];
       tenantDetails.map(async (item) => {
         rooms.add(await Room.find({ tenantId: item._id }));
