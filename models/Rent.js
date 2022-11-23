@@ -12,6 +12,10 @@ const RentSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  tenantUserId: {
+    type: String,
+    required: false,
+  },
   tenantName: {
     type: String,
   },

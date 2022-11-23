@@ -1,4 +1,5 @@
 const Joi = require("@hapi/joi");
+const { USER_TYPE } = require("../constants/appContants");
 const User = require("../models/User");
 
 //Register validation
@@ -39,6 +40,26 @@ const checkUserExists = async (mobile) => {
   return userExists;
 };
 
+/*
+ * method to check if user is landlord
+ */
+const isLandlordUser = async (userId) => {
+  try {
+    let user = await User.findOne({ _id: userId });
+    console.log(user);
+    //add landlordId or tenantId filter
+    if (user && user.userType === USER_TYPE.LANDLORD) {
+      return true;
+    } else if (user && user.userType === USER_TYPE.TENANT) {
+      return false;
+    }
+    throw "User not found";
+  } catch (error) {
+    throw error.message ? error.message : JSON.stringify(error);
+  }
+};
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.checkUserExists = checkUserExists;
+module.exports.isLandlordUser = isLandlordUser;
