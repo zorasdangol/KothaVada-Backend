@@ -11,7 +11,22 @@ const { STATUS_TENANT } = require("../constants/appContants");
 router.get("/", tokenVerifier, async (req, res) => {
   try {
     const rooms = await Room.find({ landlordId: req.user._id });
-    res.json(rooms);
+    let responseData = { rooms: rooms };
+    if (rooms) {
+      let roomIds = [];
+      rooms.forEach((element) => {
+        if (element.tenantId) {
+          roomIds.push(element._id);
+        }
+      });
+      //get tenant list for tenant
+      let tenantDetails = await Tenant.find({
+        roomId: { $in: roomIds },
+        status: STATUS_TENANT.ACTIVE,
+      });
+      responseData.tenantDetails = tenantDetails;
+    }
+    res.json(responseData);
   } catch (err) {
     res.status(400).json({ message: err });
   }
