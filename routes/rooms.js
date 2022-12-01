@@ -47,7 +47,7 @@ router.get("/tenantRooms", tokenVerifier, async (req, res) => {
         roomIds.push(element.roomId);
       });
       let rooms = await Room.find({ _id: { $in: roomIds } });
-      res.json(rooms);
+      res.json({ rooms: rooms });
     } else {
       res.json([]);
     }
