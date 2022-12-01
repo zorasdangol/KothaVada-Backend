@@ -7,7 +7,7 @@ const tokenVerifier = require("./verifyToken");
 
 const conn = require("../services/connection");
 const { default: mongoose } = require("mongoose");
-const { STATUS_TENANT } = require("../constants/appContants");
+const { STATUS_TENANT, OCCUPANCY } = require("../constants/appContants");
 
 //ADD A Tenent
 router.post("/", tokenVerifier, async (req, res) => {
@@ -136,6 +136,7 @@ const updateRoom = async (session, tenant) => {
     if (room) {
       room.tenantId = tenant._id;
       room.tenantName = tenant.tenantName;
+      room.occupancy = OCCUPANCY.FULL;
       await Room.updateOne({ _id: room._id }, { $set: room });
     }
   } catch (error) {

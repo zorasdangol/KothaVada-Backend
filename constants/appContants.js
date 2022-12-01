@@ -14,6 +14,11 @@ module.exports.USER_TYPE = {
   TENANT: "TENANT",
 };
 
+module.exports.OCCUPANCY = {
+  FULL: "FULL",
+  VACANT: "VACANT",
+};
+
 module.exports.SMS = {
   API_URL_SMS: "http://api.sparrowsms.com/v2/sms/",
   FROM: "Demo",
