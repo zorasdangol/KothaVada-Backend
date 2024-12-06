@@ -166,7 +166,7 @@ router.post("/resetPassword", async (req, res) => {
       if (!user) {
         return res
           .status(400)
-          .send({ message: "OTP not verified or user not found" });
+          .send({ message: "User not found" });
       }
       //Hash the new password
       const salt = await bcrypt.genSalt(10);
