@@ -163,7 +163,7 @@ router.post("/resetPassword", async (req, res) => {
     let isOtpVerified = await otpVerifier(req);
     if (isOtpVerified) {
       const user = await User.findOne({ mobile: mobile });
-      if (!user || !user.otpVerified) {
+      if (!user) {
         return res
           .status(400)
           .send({ message: "OTP not verified or user not found" });
@@ -174,7 +174,6 @@ router.post("/resetPassword", async (req, res) => {
 
       //Update the use's password and rest OTP verification status
       user.password = hashedPassword;
-      user.otpVerified = false;
       await user.save();
 
       return res.status(200).send({ message: "Password updated successfully" });
