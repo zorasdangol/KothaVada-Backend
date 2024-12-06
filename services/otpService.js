@@ -1,7 +1,7 @@
 require("fetch-everywhere");
 const KVConstants = require("../constants/appContants");
 
-const sendOTP = async (smsData) => {
+const sendSMS = async (smsData) => {
   let response;
   smsData.token = KVConstants.SMS.TOKEN;
   smsData.from = KVConstants.SMS.FROM;
@@ -48,5 +48,5 @@ const generateOTP = () => {
   return otpNumber;
 };
 
-module.exports.sendOTP = sendOTP;
+module.exports.sendSMS = sendSMS;
 module.exports.generateOTP = generateOTP;

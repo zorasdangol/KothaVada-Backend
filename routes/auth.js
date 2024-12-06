@@ -5,7 +5,7 @@ const {
   loginValidation,
   checkUserExists,
 } = require("../services/userValidation");
-const { sendOTP, generateOTP } = require("../services/otpService");
+const { sendSMS, generateOTP } = require("../services/otpService");
 const {
   smsValidation,
   otpValidation,
@@ -107,17 +107,16 @@ router.get("/verifyToken", tokenVerifier, (req, res) => {
 });
 
 /**
- * sendOTP API verified by Gunn 2024-12-6
- * router.get("/sendSMS", tokenVerifier, (req, res) => {
+ * sendRegisterSMS API verified by Gunn 2024-12-6
  */
-router.post("/sendSMS", async (req, res) => {
+router.post("/sendRegisterSMS", async (req, res) => {
   try {
     const { error } = smsValidation(req.body);
     if (error) {
       console.log(error);
       return res.status(400).send({ message: error.details[0].message });
     } else {
-      let response = await sendOTP(req.body);
+      let response = await sendSMS(req.body);
       if (response === 200) {
         return res.status(200).send({
           status: response.response_code,
@@ -155,7 +154,9 @@ router.post("/verifyOTP", async (req, res) => {
     res.status(400).send({ message: error.message ? error.message : error });
   }
 });
-
+/**
+ * Verifies OTP and updates password
+ */
 router.post("/resetPassword", async (req, res) => {
   try {
     const { mobile, password, otp } = req.body;
@@ -186,10 +187,9 @@ router.post("/resetPassword", async (req, res) => {
 });
 
 /**
- * sendOTP API verified by Gunn 2024-12-6
- * router.get("/sendOTP", tokenVerifier, (req, res) => {
+ * sendPasswordResetOTP API verified by Gunn 2024-12-6
  */
-router.post("/sendOTP", async (req, res) => {
+router.post("/sendPasswordResetOTP", async (req, res) => {
   try {
     const { error } = mobileValidation(req.body); //Validate mobile input
 
@@ -209,7 +209,7 @@ router.post("/sendOTP", async (req, res) => {
     req.body.text = "" + otp + "";
 
     //Send OTP via SMS
-    const response = await sendOTP(req.body);
+    const response = await sendSMS(req.body);
     if (response === 200) {
       return res.status(200).send({ mesage: "OTP send successfully" });
     } else {
