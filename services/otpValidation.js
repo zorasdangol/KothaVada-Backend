@@ -23,5 +23,17 @@ const otpValidation = (data) => {
   return schema.validate(data);
 };
 
+/**
+ * validate mobile length
+ */
+
+const mobileValidation = (data) =>{
+  const schema = Joi.object({
+    to: Joi.string().min(10).required()
+  });
+  return schema.validate(data);
+}
+
 module.exports.smsValidation = smsValidation;
 module.exports.otpValidation = otpValidation;
+module.exports.mobileValidation = mobileValidation;
